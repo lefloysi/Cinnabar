@@ -1,0 +1,46 @@
+
+namespace lf {
+	template<typename T>
+	class basic_string {
+		constexpr usize SSO_SIZE = 24;
+
+		fn basic_string(var basic_string& this);
+		fn basic_string(var basic_string& this, const T* text, usize size) -> void | allocation_error ;
+		fn ~basic_string(var basic_string& this);
+
+		fn reserve(var basic_string& this, usize size) -> void | allocation_error ;
+
+	  private:
+		fn _fits(usize size) -> bool;
+		union {
+			T* ptr;
+			T[SSO_SIZE] inline
+		} text;
+		usize capacity;
+		usize size;
+	}
+	// template is inherited
+	fn basic_string::basic_string(var basic_string& this) : capacity = SSO_SIZE {}
+	fn basic_string::basic_string(var basic_string& this, const T* text, usize size) -> void | allocation_error {
+		T* target;
+		if (_fits(size)) {
+			target = this.text.inline;
+		}
+		else {
+			reserve(@this, size) else |err| return err;
+			target = this.text.ptr;
+		}
+		memcpy(target, text, size);
+	}
+
+	fn basic_string::reserve(var basic_string& this, usize size) -> void | allocation_error {
+		size > SSO_SIZE  else return;
+		// Allocate the string : TODO IDK ALLOCATION SEMANTICS YET
+	}
+	fn basic_string::_fits(usize size) -> bool {
+		return size < SSO_SIZE;
+	}
+
+
+
+}
