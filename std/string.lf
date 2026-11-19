@@ -19,13 +19,14 @@ namespace lf {
 		usize capacity;
 		usize size;
 	}
-	// template is inherited
-	fn basic_string::basic_string(var basic_string& this) : capacity = SSO_SIZE {}
+	fn basic_string::basic_string(var basic_string& this) { 
+		@capacity = SSO_SIZE;
+	}
 	fn basic_string::basic_string(var basic_string& this, const T* text, usize size) -> void | allocation_error {
 		T* target;
 		if (_fits(size)) {
 			target = this.text.inline;
-		}
+		}1
 		else {
 			reserve(@this, size) else |err| return err;
 			target = this.text.ptr;

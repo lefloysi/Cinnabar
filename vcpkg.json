@@ -1,7 +1,5 @@
 {
   "name": "leaf",
   "dependencies": [
-    "cli11",
-    "llvm"
   ]
 }

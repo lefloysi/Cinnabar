@@ -5,12 +5,11 @@
       "name": "debug",
       "displayName": "Debug",
       "generator": "Ninja",
-      "binaryDir": "build/debug",
+      "binaryDir": ".build/debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-        "CLI11_PRECOMPILED": "ON",
-
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/.vcpkg_installed"
       }
     }
   ]
