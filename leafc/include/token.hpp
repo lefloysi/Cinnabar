@@ -5,6 +5,7 @@
 
 #include <format>
 #include <string_view>
+#include <unordered_map>
 
 namespace lf {
 	class Token {
@@ -24,7 +25,7 @@ namespace lf {
 			kw_enum,		  // enum
 			kw_extern,		  // extern
 			kw_export,		  // export
-			
+
 			op_decimal,		  // .
 			op_plus,		  // +
 			op_minus,		  // -
@@ -34,6 +35,7 @@ namespace lf {
 			op_arrow_left,	  // <-
 			op_bitshift_left, // <<
 			op_modulus,		  // %
+			op_equal,		  // =
 			op_equal_equal,	  // ==
 			op_greater_equal, // >=
 			op_lesser_equal,  // <=
@@ -72,9 +74,14 @@ namespace lf {
 		static Token end_of_file(const Cursor& cursor);
 		static Token identifier(const Cursor& cursor, std::string_view text);
 		static Token number_literal(const Cursor& cursor, std::string_view text);
-		Token() = default;
+		static Token string_litearl(const Cursor& cursor, std::string_view text);
+		static Token symbol(const Cursor& cursor, Type type, std::string_view text);
 
+		Token() = default;
 		inline Type type() const noexcept { return _type; }
+
+		static const std::unordered_map<std::string_view, Type> operator_lookup;
+		static const std::unordered_map<std::string_view, Type> keyword_lookup;
 
 	  // private:
 		Type _type = Type::none;

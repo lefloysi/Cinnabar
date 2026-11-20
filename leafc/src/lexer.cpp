@@ -2,7 +2,7 @@
 
 #include <print>
 #include <expected>
-
+#include <unordered_map>
 
 namespace lf {
 	std::expected<std::vector<Token>, std::vector<error>> Lexer::lex(Lexer&& lexer) {
@@ -67,11 +67,9 @@ namespace lf {
 		}
 		// this is complicated. really we wanna check if the sequence is inside the prefix tree.
 		// if its not in the prefix tree we want to cause an error.
-		else if (false) {
+		else {
+			return lex_operator();
 		}
-		advance();
-		// some kind of error.
-		return std::unexpected(error("something"));
 	}
 
 	Token Lexer::lex_identifier() {
@@ -84,8 +82,23 @@ namespace lf {
 		const Cursor cursor = this->cursor;
 		return Token::number_literal(cursor, max_munch(is_allowed));
 	}
-	Token Lexer::lex_operator() {
-		return Token::end_of_file(cursor);
+Token Lexer::lex_operator() {
+	u64 length = 1;
+	const Cursor cursor = this->cursor;
+	Token::Type result = Token::Type::none;
+	while (true) {
+		std::string_view view = std::string_view(source.data() + cursor.position, length);
+		if (auto it = Token::operator_lookup.find(view); it == Token::operator_lookup.end()) {
+			advance();
+			break;
+		}
+		else {
+			result = it->second;
+		}
+		advance();
+		length++;
 	}
+	return Token::symbol(cursor, result, std::string_view(source.data() + cursor.position, length - 1));
+}
 
 } // namespace lf

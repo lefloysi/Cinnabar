@@ -4,6 +4,14 @@
 
 
 namespace lf {
+	const std::unordered_map<std::string_view, Token::Type> Token::operator_lookup = {
+		{ "=", Token::Type::op_equal },
+		{ ":", Token::Type::op_colon },
+	};
+	const std::unordered_map<std::string_view, Token::Type> Token::keyword_lookup = {
+		{ "i32", Token::Type::type_i32 },
+	};
+
 	Token Token::end_of_file(const Cursor& cursor) {
 		Token token;
 		token._type = Type::eof;
@@ -25,5 +33,11 @@ namespace lf {
 		token._cursor = cursor;
 		return token;
 	}
-
+	Token Token::symbol(const Cursor& cursor, Type type, std::string_view text) {
+		Token token;
+		token._type = type;
+		token._literal = text;
+		token._cursor = cursor;
+		return token;
+	}
 }
