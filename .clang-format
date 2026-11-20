@@ -13,7 +13,6 @@ AlignTrailingComments:
   Kind: Always
   OverEmptyLines: 2
 
-BreakBeforeBraces: Attach
 NamespaceIndentation: All
 Cpp11BracedListStyle: false
 AlignAfterOpenBracket: BlockIndent
@@ -24,3 +23,7 @@ AllowShortIfStatementsOnASingleLine: AllIfsAndElse
 SpaceBeforeParens: ControlStatements
 SpaceAfterTemplateKeyword: false
 PackConstructorInitializers: CurrentLine
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterControlStatement: Never
+  BeforeElse: true

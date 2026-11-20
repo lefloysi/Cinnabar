@@ -1,8 +1,11 @@
 #pragma once
 
 #include "types.hpp"
+#include "cursor.hpp"
 
+#include <format>
 #include <string_view>
+
 namespace lf {
 	class Token {
 	  public:
@@ -12,37 +15,40 @@ namespace lf {
 			eof,
 			illegal,
 
-			keyword_return,	   // return
-			keyword_fn,		   // fn
-			keyword_var,	   // var
-			keyword_const,	   // const
-			keyword_class,	   // class
-			keyword_union,	   // union
-			keyword_enum,	   // enum
-
-			key_decimal,	   // .
-			key_plus,		   // +
-			key_minus,		   // -
-			key_asterik,	   // *
-			key_slash,		   // /
-			key_arrow_right,   // ->
-			key_arrow_left,	   // <-
-			key_bitshift_left, // <<
-			key_modulus,	   // %
-			key_equal_equal,   // ==
-			key_greater_equal, // >=
-			key_lesser_equal,  // <=
-			key_lesser_than,   // <
-			key_greater_than,  // >
-			key_semicolon,	   // ;
-			key_colon,		   // :
-			key_lparan,		   // (
-			key_rparan,		   // )
-			key_lbracket,	   // [
-			key_rbracket,	   // ]
-			key_lbrace,		   // {
-			key_rbrace,		   // }
-
+			kw_return,		  // return
+			kw_fn,			  // fn
+			kw_var,			  // var
+			kw_const,		  // const
+			kw_class,		  // class
+			kw_union,		  // union
+			kw_enum,		  // enum
+			kw_extern,		  // extern
+			kw_export,		  // export
+			
+			op_decimal,		  // .
+			op_plus,		  // +
+			op_minus,		  // -
+			op_asterik,		  // *
+			op_slash,		  // /
+			op_arrow_right,	  // ->
+			op_arrow_left,	  // <-
+			op_bitshift_left, // <<
+			op_modulus,		  // %
+			op_equal_equal,	  // ==
+			op_greater_equal, // >=
+			op_lesser_equal,  // <=
+			op_lesser_than,	  // <
+			op_greater_than,  // >
+			op_semicolon,	  // ;
+			op_colon,		  // :
+			op_colonequal,    // :=
+			op_lparan,		  // (
+			op_rparan,		  // )
+			op_lbracket,	  // [
+			op_rbracket,	  // ]
+			op_lbrace,		  // {
+			op_rbrace,		  // }
+			
 			type_void,		   // void
 			type_bool,		   // bool
 			type_ch08,		   // ch08
@@ -58,14 +64,89 @@ namespace lf {
 			type_u64,		   // u64
 			type_f32,		   // f32
 			type_f64,		   // f64
+			
+			literal_number,	   // 123.123
+			literal_string,	   // "SomeString"
+ 		};
 
+		static Token end_of_file(const Cursor& cursor);
+		static Token identifier(const Cursor& cursor, std::string_view text);
+		static Token number_literal(const Cursor& cursor, std::string_view text);
+		Token() = default;
+
+		inline Type type() const noexcept { return _type; }
+
+	  // private:
+		Type _type = Type::none;
+		std::string_view _literal = "";
+		Cursor _cursor;
+	};
+
+
+} // namespace lf
+
+template<>
+struct std::formatter<lf::Token::Type> {
+	constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+
+	auto format(const lf::Token::Type& obj, auto& ctx) const {
+		static constexpr std::string_view token_strings[] = {
+			"",
+			"",
+			"",
+			"",
+
+			"return",
+			"fn",
+			"var",
+			"const",
+			"class",
+			"union",
+			"enum",
+			"extern",
+			"export",
+
+			".",
+			"+",
+			"-",
+			"*",
+			"/",
+			"->",
+			"<-",
+			"<<",
+			"%",
+			"==",
+			">=",
+			"<=",
+			"<",
+			">",
+			";",
+			":",
+			":=",
+			"(",
+			")",
+			"[",
+			"]",
+			"{",
+			"}",
+
+			"void",
+			"bool",
+			"ch08",
+			"ch16",
+			"ch32",
+			"i08",
+			"i16",
+			"i32",
+			"i64",
+			"u08",
+			"u16",
+			"u32",
+			"u64",
+			"f32",
+			"f64",
 		};
 
-	  private:
-		Type type;
-		std::string_view literal;
-
-		u64 line_pos{};
-		u64 char_pos{};
-	};
-} // namespace lf
+		return std::format_to(ctx.out(), "{}", token_strings[static_cast<size_t>(obj)]);
+	}
+};

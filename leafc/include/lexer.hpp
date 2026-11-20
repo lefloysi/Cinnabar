@@ -2,23 +2,47 @@
 
 #include "token.hpp"
 #include "types.hpp"
+#include "error.hpp"
+#include "cursor.hpp"
 
 #include <string>
 #include <string_view>
+#include <vector>
+#include <expected>
+
 namespace lf {
-	class Lexer {
-	  public:
-		explicit Lexer(std::string_view source);
 
-	  private:
-		char _read();
-		// amount 0 gets the very next char
-		char _peek(u64 amount = 0);
-		void skip_whitespace();
 
-		u64 _line_no{};
-		u64 _position{};
-		std::string _source;
+	struct Lexer {
+		
+		static std::expected<std::vector<Token>, std::vector<error>> lex(Lexer&& lexer);
+		Lexer(const char* source);
+		Lexer(std::string_view source);
+
+		std::string_view source;
+		Cursor cursor;
+
+	    unsigned char peek(u64 amount = 0) const;
+	    unsigned char advance();
+		bool skip_whitespace();
+
+		std::expected<Token, error> lex_next();
+		Token lex_identifier();
+		Token lex_number();
+		Token lex_operator();
+
+		template<typename Predicate>
+		inline std::string_view max_munch(Predicate condition) {
+			Cursor start = cursor;
+			u64 length = 0;
+			while (condition(advance())) {
+				++length;
+			}
+			return std::string_view(source.data() + start.position, length);
+		}
 
 	};
+
+
+
 } // namespace lf
