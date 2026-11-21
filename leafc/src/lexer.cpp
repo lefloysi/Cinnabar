@@ -6,17 +6,10 @@
 #include <unordered_map>
 
 namespace lf {
-	std::expected<std::vector<Token>, std::vector<error>> Lexer::lex(Lexer&& lexer) {
+	std::vector<Token> Lexer::lex(Lexer&& lexer) {
 		std::vector<Token> result;
 		while (lexer.cursor.position < lexer.source.size()) {
-			auto token_result = lexer.lex_next();
-			if (!token_result) {
-				std::println("{}: ya messed up", token_result.error());
-				result.emplace_back(Token::illegal());
-			} else {
-				result.emplace_back(std::move(*token_result));
-			}
-
+			result.emplace_back(lexer.lex_next());
 		}
 		return result;
 	}
@@ -28,7 +21,7 @@ namespace lf {
 		unsigned char result = peek();
 		if (result == '\n') {
 			cursor.line_no++;
-			cursor.char_no = 0;
+			cursor.char_no = 1;
 		} else {
 			cursor.char_no++;
 		}
@@ -49,9 +42,9 @@ namespace lf {
 		return start != cursor.position;
 	}
 
-	std::expected<Token, error> Lexer::lex_next() {
+	Token Lexer::lex_next() {
 		skip_whitespace();
-		unsigned char next = peek();
+		uchar next = peek();
 		// first, is this end of file?
 		if (next == '\0') {
 			return Token::end_of_file(cursor);
@@ -66,12 +59,13 @@ namespace lf {
 			return lex_number();
 		}
 		// this is complicated. really we wanna check if the sequence is inside the prefix tree.
-		// if its not in the prefix tree we want to cause an error.
+		// if its not in the prefix tree we want to cause an error. TODO : Add prefix tree 
 		else if (can_lex_operator(next)) {
 			return lex_operator();
 		}
+		const Cursor copy = cursor;
 		advance();
-		return std::unexpected(error::format("bad charackter: '{}'", next));
+		return Token::illegal(copy, source.substr(copy.position, 1));
 	}
 
 	Token Lexer::lex_identifier() {

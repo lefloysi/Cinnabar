@@ -15,7 +15,7 @@ namespace lf {
 
 	struct Lexer {
 		
-		static std::expected<std::vector<Token>, std::vector<error>> lex(Lexer&& lexer);
+		static std::vector<Token> lex(Lexer&& lexer);
 		Lexer(const char* source);
 		Lexer(std::string_view source);
 
@@ -26,7 +26,7 @@ namespace lf {
 	    unsigned char advance();
 		bool skip_whitespace();
 
-		std::expected<Token, error> lex_next();
+		Token lex_next();
 		Token lex_identifier();
 		Token lex_number();
 		Token lex_operator();
@@ -40,7 +40,8 @@ namespace lf {
 		inline std::string_view max_munch(Predicate condition) {
 			Cursor start = cursor;
 			u64 length = 0;
-			while (condition(advance())) {
+			while (condition(peek())) {
+				advance();
 				++length;
 			}
 			return std::string_view(source.data() + start.position, length);

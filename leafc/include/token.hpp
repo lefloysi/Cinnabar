@@ -76,10 +76,11 @@ namespace lf {
 		static Token number_literal(const Cursor& cursor, std::string_view text);
 		static Token string_literal(const Cursor& cursor, std::string_view text);
 		static Token symbol(const Cursor& cursor, Type type, std::string_view text);
-		static Token illegal();
+		static Token illegal(const Cursor& cursor, std::string_view text);
 		Token() = default;
 		inline Type type() const noexcept { return _type; }
 		inline std::string_view literal() const noexcept { return _literal; }
+
 		static const std::unordered_map<std::string_view, Type> operator_lookup;
 		static const std::unordered_map<std::string_view, Type> keyword_lookup;
 

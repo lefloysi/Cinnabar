@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 
+using uchar = unsigned char;
 
 using i08 = std::int8_t;
 using i16 = std::int16_t;

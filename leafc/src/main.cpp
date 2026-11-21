@@ -10,15 +10,15 @@
 #include <print>
 
 const char* code = R"(
-var Foo : i32 = 5;
+var Foo : i32 = 5; void
+0i32 return something;
 
 )";
 
 
 i32 main(i32 argc, char* argv[]) {
 
-    auto result = lf::Lexer::lex(code);
-	auto tokens = *result;
+    auto tokens = lf::Lexer::lex(code);
     for (auto token : tokens) {
 		std::println("{}", token);
     }
