@@ -74,16 +74,16 @@ namespace lf {
 		static Token end_of_file(const Cursor& cursor);
 		static Token identifier(const Cursor& cursor, std::string_view text);
 		static Token number_literal(const Cursor& cursor, std::string_view text);
-		static Token string_litearl(const Cursor& cursor, std::string_view text);
+		static Token string_literal(const Cursor& cursor, std::string_view text);
 		static Token symbol(const Cursor& cursor, Type type, std::string_view text);
-
+		static Token illegal();
 		Token() = default;
 		inline Type type() const noexcept { return _type; }
-
+		inline std::string_view literal() const noexcept { return _literal; }
 		static const std::unordered_map<std::string_view, Type> operator_lookup;
 		static const std::unordered_map<std::string_view, Type> keyword_lookup;
 
-	  // private:
+	  private:
 		Type _type = Type::none;
 		std::string_view _literal = "";
 		Cursor _cursor;
@@ -98,62 +98,76 @@ struct std::formatter<lf::Token::Type> {
 
 	auto format(const lf::Token::Type& obj, auto& ctx) const {
 		static constexpr std::string_view token_strings[] = {
-			"",
-			"",
-			"",
-			"",
+			"NONE",
+			"IDENTIFIER",
+			"EOF",
+			"ILLEGAL",
 
-			"return",
-			"fn",
-			"var",
-			"const",
-			"class",
-			"union",
-			"enum",
-			"extern",
-			"export",
+			"RETURN",         // return
+			"FN",			  // fn
+			"VAR",			  // var
+			"CONST",		  // const
+			"CLASS",		  // class
+			"UNION",		  // union
+			"ENUM",			  // enum
+			"EXTERN",		  // extern
+			"EXPORT",		  // export
 
-			".",
-			"+",
-			"-",
-			"*",
-			"/",
-			"->",
-			"<-",
-			"<<",
-			"%",
-			"==",
-			">=",
-			"<=",
-			"<",
-			">",
-			";",
-			":",
-			":=",
-			"(",
-			")",
-			"[",
-			"]",
-			"{",
-			"}",
+			"DOT",			  // .
+			"PLUS",			  // +
+			"MINUS",		  // -
+			"ASTERIK",		  // *
+			"SLASH",		  // /
+			"ARROW_RIGHT",	  // ->
+			"ARROW_LEFT",	  // <-
+			"BITSHIFT_LEFT",  // <<
+			"MODULUS",		  // %
+			"EQUALS",		  // =
+			"EQUALS_EQUALS",  // ==
+			"GREATER_EQUALS", // >=
+			"LESSER_EQUALS",  // <=
+			"LESSER",		  // <
+			"GREATER",		  // >
+			"SEMICOLON",	  // ;
+			"COLON",		  // :
+			"COLON_EQUALS",	  // :=
+			"LPARANTHESE",	  // (
+			"RPARANTHESE",	  // )
+			"LBRACKET",		  // [
+			"RBRACKET",		  // ]
+			"LBRACE",		  // {
+			"RBRACE",		  // }
 
-			"void",
-			"bool",
-			"ch08",
-			"ch16",
-			"ch32",
-			"i08",
-			"i16",
-			"i32",
-			"i64",
-			"u08",
-			"u16",
-			"u32",
-			"u64",
-			"f32",
-			"f64",
+			"VOID",			  // void
+			"BOOL",			  // bool
+			"CH08",			  // ch08
+			"CH16",			  // ch16
+			"CH32",			  // ch32
+			"I08",			  // i08
+			"I16",			  // i16
+			"I32",			  // i32
+			"I64",			  // i64
+			"U08",			  // u08
+			"U16",			  // u16
+			"U32",			  // u32
+			"U64",			  // u64
+			"F32",			  // f32
+			"F64",			  // f64
+
+			"NUM_LITERAL",	  // 123.123
+			"STR_LITERAL",	  // "SomeString"
 		};
 
 		return std::format_to(ctx.out(), "{}", token_strings[static_cast<size_t>(obj)]);
 	}
 };
+
+template<>
+struct std::formatter<lf::Token> {
+	constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
+
+	auto format(const lf::Token& obj, auto& ctx) const {
+		return std::format_to(ctx.out(), "{}({}) ", obj.type(), obj.literal());
+	}
+};
+

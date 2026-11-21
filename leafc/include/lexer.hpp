@@ -31,6 +31,11 @@ namespace lf {
 		Token lex_number();
 		Token lex_operator();
 
+		private:
+		static bool can_lex_identifier(unsigned char next);
+		static bool can_lex_number(unsigned char next);
+		static bool can_lex_operator(unsigned char next);
+
 		template<typename Predicate>
 		inline std::string_view max_munch(Predicate condition) {
 			Cursor start = cursor;

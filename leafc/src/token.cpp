@@ -9,6 +9,7 @@ namespace lf {
 		{ ":", Token::Type::op_colon },
 	};
 	const std::unordered_map<std::string_view, Token::Type> Token::keyword_lookup = {
+		{ "var", Token::Type::kw_var },
 		{ "i32", Token::Type::type_i32 },
 	};
 
@@ -21,7 +22,13 @@ namespace lf {
 	}
 	Token Token::identifier(const Cursor& cursor, std::string_view text) {
 		Token token;
-		token._type = Type::identifier;
+		;
+		if (const auto& it = Token::keyword_lookup.find(text); it == Token::keyword_lookup.end()) {
+			token._type = Type::identifier;
+		}
+		else {
+			token._type = it->second;
+		}
 		token._literal = text;
 		token._cursor = cursor;
 		return token;
@@ -40,4 +47,11 @@ namespace lf {
 		token._cursor = cursor;
 		return token;
 	}
+
+	Token Token::illegal() {
+		Token token;
+		token._type = Type::illegal;
+		return token;
+	}
+
 }

@@ -21,7 +21,7 @@ namespace lf {
 	};
 	template<typename... Args>
 	error error::format(std::format_string<Args...> fmt, Args&&... args) {
-
+		return error(std::format(fmt, std::forward<Args>(args)...));
 	}
 
 	struct error_location {
