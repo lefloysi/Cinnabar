@@ -34,8 +34,6 @@ namespace lf {
 		
 			return error("foo");
 		}
-		std::string sequence;
-		Cursor cursor;
 	};
 }
 
