@@ -1,0 +1,79 @@
+\documentclass{article}
+
+% ==============================================================================
+% C++ Standard Paragraph & Sub-paragraph Numbering Macros
+% ==============================================================================
+
+\newcounter{stdpara}
+\counterwithin*{stdpara}{section}
+\counterwithin*{stdpara}{subsection}
+\counterwithin*{stdpara}{subsubsection}
+
+% Optional manual override: e.g., \setpnum{0} makes the next \pnum start at 1
+\newcommand{\setparanum}[1]{\setcounter{stdpara}{#1}}
+
+% Distance from the left text margin to the right edge of all margin numbers
+\newlength{\marginnumsep}
+\AtBeginDocument{\setlength{\marginnumsep}{1em}}
+
+% Numbered paragraph command (\pnum)
+\newcommand{\para}{%
+  \par\medskip\noindent%
+  \refstepcounter{stdpara}%
+  \makebox[0pt][r]{\raisebox{0.35ex}{\scriptsize\thestdpara}\hspace{\marginnumsep}}%
+  \ignorespaces
+}
+
+% Sub-paragraph counter and environment (subpara)
+\newcounter{stdsubpara}[stdpara]
+\renewcommand{\thestdsubpara}{\thestdpara.\arabic{stdsubpara}}
+
+\newenvironment{subpara}{%
+  \begin{list}{}{%
+    \setlength{\topsep}{0.35em}%
+    \setlength{\itemsep}{0.35em}%
+    \setlength{\parsep}{0pt}%
+    \settowidth{\labelwidth}{---}
+    \setlength{\labelsep}{1em}
+    \setlength{\itemindent}{1em}
+    \setlength{\leftmargin}{\dimexpr\itemindent + \labelwidth + \labelsep\relax}%
+    \setlength{\itemindent}{0pt}
+    \renewcommand{\makelabel}[1]{
+      \refstepcounter{stdsubpara}
+      \makebox[0pt][r]{
+        \footnotesize(\thestdsubpara)
+        \hspace{\dimexpr\leftmargin - \labelsep - \labelwidth + \marginnumsep\relax}%
+      }%
+      ---%
+    }%
+  }%
+}{%
+  \end{list}%
+}
+
+% ==============================================================================
+% Document Body
+% ==============================================================================
+
+\begin{document}
+
+\section{General}
+\subsection{Scope}
+
+\para The set of \textit{diagnosable rules} consists of all syntactic and semantic rules in this document that are not explicitly referred to as ``undefined behavior''.
+
+\para\label{p:impl-req} Although this document states only requirements on C++ implementations, those requirements are often easier to understand if they are phrased as requirements on programs. Such requirements have the following form:
+
+\begin{subpara}
+  \item\label{p:accept} If a program contains no violations of the rules in this document, a conforming implementation shall accept and correctly execute that program.
+  \item If a program contains a violation of any diagnosable rule, a conforming implementation shall issue at least one diagnostic message.
+  \item If a program contains a violation of a rule for which no diagnostic is required, this document places no requirement on implementations.
+\end{subpara}
+
+\para For classes and class templates, the library Clauses specify partial definitions (see paragraph~\ref{p:impl-req} and item~(\ref{p:accept})).
+
+\subsection{Next Subsection}
+
+\para Starting a new subsection automatically resets the paragraph counter back to 1.
+
+\end{document}

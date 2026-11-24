@@ -18,7 +18,7 @@ var Foo : i32 = 5; void
 
 i32 main(i32 argc, char* argv[]) {
 
-    auto tokens = lf::Lexer::lex(code);
+    auto tokens = lf::Lexer::lex(std::string_view(code));
     for (auto token : tokens) {
 		std::println("{}", token);
     }

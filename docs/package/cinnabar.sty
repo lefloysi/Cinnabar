@@ -1,0 +1,78 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{cinnabar}[2026/11/24 Cinnabar document style]
+
+\RequirePackage{eqparbox}
+
+% Paragraph formatting
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.25em}
+
+% Counters
+\newcounter{stdpara}
+\counterwithin*{stdpara}{section}
+\counterwithin*{stdpara}{subsection}
+\counterwithin*{stdpara}{subsubsection}
+
+\newcounter{stdsubpara}[stdpara]
+\renewcommand{\thestdsubpara}{\thestdpara.\arabic{stdsubpara}}
+
+% ==============================================================================
+% Configurable Settings
+% ==============================================================================
+
+
+\newlength{\marginnumsep}
+\setlength{\marginnumsep}{12pt}       % distance of numbers into left margin
+
+\newlength{\subparadashindent}
+\setlength{\subparadashindent}{1em}   % how far in the em-dash starts
+
+\newlength{\subparadashsep}
+\setlength{\subparadashsep}{0.8em}    % gap between em-dash and text
+
+% Labeled paragraph settings (\para[Label] and \subpara[Label]):
+\newcommand{\paralabelpunct}{:}        % separator character (e.g., :, --, ->)
+\newlength{\paralabelpresep}
+\setlength{\paralabelpresep}{0.4em}   % minimum space between longest label and separator
+\newlength{\paralabelpostsep}
+\setlength{\paralabelpostsep}{0.6em}  % space between separator and description text
+
+% ==============================================================================
+% Internal Helpers & Commands
+% ==============================================================================
+
+\newcounter{paralabelgroup}
+\newlength{\subparadashwidth}
+\AtBeginDocument{\settowidth{\subparadashwidth}{---}}
+
+\NewDocumentCommand{\para}{ o }{
+  \par\medskip\noindent
+  \refstepcounter{stdpara}
+  \makebox[0pt][r]{\raisebox{0.35ex}{\scriptsize\thestdpara}\hspace{\marginnumsep}}
+  \IfValueTF{#1}{
+    \eqmakebox[plg-\theparalabelgroup][l]{#1\hspace{\paralabelpresep}\hfill\paralabelpunct}
+    \hspace{\paralabelpostsep}
+    \hangindent=\dimexpr\eqboxwidth{plg-\theparalabelgroup} + \paralabelpostsep\relax
+    \hangafter=1
+  }{%
+    \stepcounter{paralabelgroup}
+  }%
+  \ignorespaces
+}
+
+\NewDocumentCommand{\subpara}{ o }{
+  \par\smallskip\noindent
+  \refstepcounter{stdsubpara}
+  \makebox[0pt][r]{\footnotesize(\thestdsubpara)\hspace{\marginnumsep}}
+  \hspace*{\subparadashindent}---\hspace{\subparadashsep}
+  \IfValueTF{#1}{
+    \eqmakebox[plg-\theparalabelgroup][l]{#1\hspace{\paralabelpresep}\hfill\paralabelpunct}
+    \hspace{\paralabelpostsep}
+    \hangindent=\dimexpr\subparadashindent + \subparadashwidth + \subparadashsep + \eqboxwidth{plg-\theparalabelgroup} + \paralabelpostsep\relax
+    \hangafter=1
+  }{
+    \hangindent=\dimexpr\subparadashindent + \subparadashwidth + \subparadashsep\relax
+    \hangafter=1
+  }
+  \ignorespaces
+}

@@ -1,93 +1,97 @@
 #pragma once
 
 #include "types.hpp"
-#include "cursor.hpp"
+#include "identifier.hpp"
 
 #include <format>
 #include <string_view>
 #include <unordered_map>
 
+
+
 namespace lf {
 	class Token {
 	  public:
+		using Symbol = identifier<std::string, u32>;
 		enum class Type {
 			none,
 			identifier,
 			eof,
 			illegal,
 
-			kw_return,		  // return
-			kw_fn,			  // fn
-			kw_var,			  // var
-			kw_const,		  // const
-			kw_class,		  // class
-			kw_union,		  // union
-			kw_enum,		  // enum
-			kw_extern,		  // extern
-			kw_export,		  // export
+			keyw_return,		// return
+			keyw_fn,			// fn
+			keyw_var,			// var
+			keyw_const,			// const
+			keyw_class,			// class
+			keyw_union,			// union
+			keyw_enum,			// enum
+			keyw_extern,		// extern
+			keyw_export,		// export
 
-			op_decimal,		  // .
-			op_plus,		  // +
-			op_minus,		  // -
-			op_asterik,		  // *
-			op_slash,		  // /
-			op_arrow_right,	  // ->
-			op_arrow_left,	  // <-
-			op_bitshift_left, // <<
-			op_modulus,		  // %
-			op_equal,		  // =
-			op_equal_equal,	  // ==
-			op_greater_equal, // >=
-			op_lesser_equal,  // <=
-			op_lesser_than,	  // <
-			op_greater_than,  // >
-			op_semicolon,	  // ;
-			op_colon,		  // :
-			op_colonequal,    // :=
-			op_lparan,		  // (
-			op_rparan,		  // )
-			op_lbracket,	  // [
-			op_rbracket,	  // ]
-			op_lbrace,		  // {
-			op_rbrace,		  // }
-			
-			type_void,		   // void
-			type_bool,		   // bool
-			type_ch08,		   // ch08
-			type_ch16,		   // ch16
-			type_ch32,		   // ch32
-			type_i08,		   // i08
-			type_i16,		   // i16
-			type_i32,		   // i32
-			type_i64,		   // i64
-			type_u08,		   // u08
-			type_u16,		   // u16
-			type_u32,		   // u32
-			type_u64,		   // u64
-			type_f32,		   // f32
-			type_f64,		   // f64
-			
-			literal_number,	   // 123.123
-			literal_string,	   // "SomeString"
- 		};
+			punc_decimal,		// .
+			punc_plus,			// +
+			punc_minus,			// -
+			punc_asterik,		// *
+			punc_slash,			// /
+			punc_arrow_right,	// ->
+			punc_arrow_left,	// <-
+			punc_bitshift_left, // <<
+			punc_modulus,		// %
+			punc_equal,			// =
+			punc_equal_equal,	// ==
+			punc_greater_equal, // >=
+			punc_lesser_equal,	// <=
+			punc_lesser_than,	// <
+			punc_greater_than,	// >
+			punc_semicolon,		// ;
+			punc_colon,			// :
+			punc_colonequal,	// :=
+			punc_lparan,		// (
+			punc_rparan,		// )
+			punc_lbracket,		// [
+			punc_rbracket,		// ]
+			punc_lbrace,		// {
+			punc_rbrace,		// }
 
-		static Token end_of_file(const Cursor& cursor);
-		static Token identifier(const Cursor& cursor, std::string_view text);
-		static Token number_literal(const Cursor& cursor, std::string_view text);
-		static Token string_literal(const Cursor& cursor, std::string_view text);
-		static Token symbol(const Cursor& cursor, Type type, std::string_view text);
-		static Token illegal(const Cursor& cursor, std::string_view text);
-		Token() = default;
+			type_void,			// void
+			type_bool,			// bool
+			type_ch08,			// ch08
+			type_ch16,			// ch16
+			type_ch32,			// ch32
+			type_i08,			// i08
+			type_i16,			// i16
+			type_i32,			// i32
+			type_i64,			// i64
+			type_u08,			// u08
+			type_u16,			// u16
+			type_u32,			// u32
+			type_u64,			// u64
+			type_f32,			// f32
+			type_f64,			// f64
+
+			literal_number,		// 123.123
+			literal_string,		// "SomeString"
+		};
+
+		static Token end_of_file(u64 position);
+		static Token keyword(u64 position, Type type);
+		static Token identifier(u64 position, Symbol symbol);
+		static Token number_literal(u64 position, Symbol symbol);
+		static Token string_literal(u64 position, Symbol symbol);
+		static Token punctuator(u64 position, Type type);
+		static Token illegal(u64 position, Symbol symbol);
+
 		inline Type type() const noexcept { return _type; }
-		inline std::string_view literal() const noexcept { return _literal; }
+		inline Symbol symbol() const noexcept { return _symbol; }
 
 		static const std::unordered_map<std::string_view, Type> operator_lookup;
 		static const std::unordered_map<std::string_view, Type> keyword_lookup;
 
 	  private:
+		u64 _position = 0;
 		Type _type = Type::none;
-		std::string_view _literal = "";
-		Cursor _cursor;
+		Symbol _symbol;
 	};
 
 
@@ -168,7 +172,7 @@ struct std::formatter<lf::Token> {
 	constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
 
 	auto format(const lf::Token& obj, auto& ctx) const {
-		return std::format_to(ctx.out(), "{}({}) ", obj.type(), obj.literal());
+		return std::format_to(ctx.out(), "{}({}) ", obj.type(), "obj.symbol()");
 	}
 };
 

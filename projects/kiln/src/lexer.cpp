@@ -8,38 +8,31 @@
 namespace lf {
 	std::vector<Token> Lexer::lex(Lexer&& lexer) {
 		std::vector<Token> result;
-		while (lexer.cursor.position < lexer.source.size()) {
+		while (lexer._position < lexer._source.size()) {
 			result.emplace_back(lexer.lex_next());
 		}
 		return result;
 	}
 
-	Lexer::Lexer(const char* source) : source(source) {}
-	Lexer::Lexer(std::string_view source) : source(source) {}
+	Lexer::Lexer(std::string_view source) : _source(std::string(source)) {}
 	
 	unsigned char Lexer::advance() {
 		unsigned char result = peek();
-		if (result == '\n') {
-			cursor.line_no++;
-			cursor.char_no = 1;
-		} else {
-			cursor.char_no++;
-		}
-		cursor.position++;
+		_position++;
 		return result;
 	}
 	unsigned char Lexer::peek(u64 amount) const {
-		if (cursor.position + amount >= source.size()) {
+		if (_position + amount >= _source.size()) {
 			return '\0';
 		}
-		return source[cursor.position + amount];
+		return _source[_position + amount];
 	}
 	bool Lexer::skip_whitespace() {
-		u64 start = cursor.position;
+		u64 start = _position;
 		while (std::isspace(peek())) {
 			advance();
 		}
-		return start != cursor.position;
+		return start != _position;
 	}
 
 	Token Lexer::lex_next() {
@@ -47,7 +40,7 @@ namespace lf {
 		uchar next = peek();
 		// first, is this end of file?
 		if (next == '\0') {
-			return Token::end_of_file(cursor);
+			return Token::end_of_file(_position);
 		}
 
 		// if its a char or _ lex an identifier
@@ -63,37 +56,27 @@ namespace lf {
 		else if (can_lex_operator(next)) {
 			return lex_operator();
 		}
-		const Cursor copy = cursor;
-		advance();
-		return Token::illegal(copy, source.substr(copy.position, 1));
+		
+		return Token::illegal(_position, {});
 	}
 
 	Token Lexer::lex_identifier() {
-		auto is_allowed = [](unsigned char key) { return std::isalnum(key) || key == '_'; };
-		const Cursor cursor = this->cursor;
-		return Token::identifier(cursor, max_munch(is_allowed));
+		advance();
+		return Token::identifier(_position, {});
 	}
 	Token Lexer::lex_number() {
 		auto is_allowed = [](unsigned char key) { return std::isdigit(key) || key == '.'; };
-		const Cursor cursor = this->cursor;
-		return Token::number_literal(cursor, max_munch(is_allowed));
+		advance();
+		return Token::number_literal(_position, {});
 	}
+
+
 	Token Lexer::lex_operator() {
 		u64 length = 1;
-		const Cursor cursor = this->cursor;
 		Token::Type result = Token::Type::none;
-		while (true) {
-			std::string_view view = source.substr(cursor.position, length);
-			if (auto it = Token::operator_lookup.find(view); it == Token::operator_lookup.end()) {
-				break;
-			}
-			else {
-				result = it->second;
-			}
-			advance();
-			length++;
-		}
-		return Token::symbol(cursor, result, source.substr(cursor.position, length - 1));
+		advance();
+		return Token::punctuator(_position, Token::Type::punc_arrow_left);
+
 	}
 	bool Lexer::can_lex_identifier(unsigned char next) {
 		return std::isalpha(next) || next == '_';

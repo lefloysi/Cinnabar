@@ -1,7 +1,6 @@
 #pragma once
 
 #include "types.hpp"
-#include "cursor.hpp"
 
 #include <expected>
 #include <string>
@@ -26,7 +25,7 @@ namespace lf {
 
 	struct error_location {
 		std::filesystem::path path;
-		Cursor cursor;
+		u64 position;
 	};
 
 	struct bad_character_error {
@@ -52,11 +51,6 @@ struct std::formatter<lf::error_location> {
 	constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
 
 	auto format(const lf::error_location& obj, auto& ctx) const {
-		if (obj.cursor.char_no == 0) {
-			return std::format_to(ctx.out(), "{}({})", obj.path, obj.cursor.line_no);
-
-		} else {
-			return std::format_to(ctx.out(), "{}({},{})", obj.path, obj.cursor.line_no, obj.cursor.char_no);
-		}
+		return std::format_to(ctx.out(), "{}({})", obj.path, obj.position);
 	}
 };
